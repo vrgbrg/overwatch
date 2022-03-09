@@ -1,3 +1,5 @@
 /utils/Linux
 /overwatch/__pycache__
 /overwatch/model/__pycache__
+/static_code_analysis/repo
+/static_code_analysis/result.json
