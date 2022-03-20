@@ -1,9 +1,15 @@
 import psutil
 
-def get_running_processes():
-    list_of_running_processes = get_list_of_processes_by_memory()
-    for process in list_of_running_processes[:5]:
-        print(process)
+
+def get_running_processes(ip):
+    if ip == "localhost" or ip == "127.0.0.1":
+        list_of_running_processes = get_list_of_processes_by_memory()
+        if len(list_of_running_processes) > 0:
+            print('Running processes:')
+            for process in list_of_running_processes[:5]:
+                print(process)
+    else:
+        print('TODO')
 
 
 def get_list_of_processes_by_memory():

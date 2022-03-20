@@ -1,8 +1,11 @@
 import sys
 import click
 import pyfiglet
-from vu_scanner import search as cve_search, lookup as lookup_cve
+from PyInquirer import prompt
+from examples import custom_style_1
+from vu_scanner import search as vu_scan, lookup as lookup_cve
 from code_analysis_scanner import code_analysis
+from helper.questions import restart_question, exit_question
 
 
 @click.group()
@@ -20,17 +23,23 @@ def main():
 @click.argument('keyword', required=False)
 def search(**kwargs):
     """Search through Exploit Database for vulnerabilities"""
-    results = cve_search(kwargs.get("ip"), kwargs.get("ports"), kwargs.get("keyword"))
-    for res in results:
-        click.echo(f'{res}')
+    restart = True
+    while restart:
+        vu_scan(kwargs.get("ip"), kwargs.get("ports"), kwargs.get("keyword"))
+        restart = prompt(restart_question(),
+                         style=custom_style_1).get('restart')
+        if not restart:
+            if prompt(exit_question(), style=custom_style_1).get('exit'):
+                break
+            else:
+                restart = True
 
 
 @main.command()
 @click.argument('keyword', required=False)
 def lookup(**kwargs):
     """Get vulnerability details using its EDB-ID on Exploit Database"""
-    result = lookup_cve(kwargs.get("keyword"))
-    click.echo(f'{result}')
+    lookup_cve(kwargs.get("keyword"))
 
 
 @main.command()
@@ -44,6 +53,7 @@ def codeanalysis(**kwargs):
             "version"), kwargs.get("level"))
     else:
         print('ERROR: Please give a repository')
+
 
 if __name__ == '__main__':
     args = sys.argv

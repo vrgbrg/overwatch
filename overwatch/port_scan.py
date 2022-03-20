@@ -25,9 +25,8 @@ def display_open_ports(nmScan):
         print('Host : %s (%s)' % (host, nmScan[host].hostname()))
         print('State : %s' % nmScan[host].state())
         for proto in nmScan[host].all_protocols():
-            print('----------------------------------------------------')
+            print('\n----------------------------------------------------\n')
             print('Protocol : %s' % proto)
             lport = nmScan[host][proto].keys()
             for port in lport:
-                print('port : %s\tstate : %s' %
-                      (port, nmScan[host][proto][port]['state']))
+                print('port : {0:<7} {1:<15} state : {2:<8}'.format(port, nmScan[host][proto][port]['name'], nmScan[host][proto][port]['state']))
