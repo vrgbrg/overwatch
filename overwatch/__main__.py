@@ -1,8 +1,7 @@
 import sys
 import click
 import pyfiglet
-from PyInquirer import prompt
-from examples import custom_style_1
+from PyInquirer.prompt import prompt
 from vu_scanner import search as vu_scan, lookup as lookup_cve
 from code_analysis_scanner import code_analysis
 from helper.questions import restart_question, exit_question
@@ -26,10 +25,9 @@ def search(**kwargs):
     restart = True
     while restart:
         vu_scan(kwargs.get("ip"), kwargs.get("ports"), kwargs.get("keyword"))
-        restart = prompt(restart_question(),
-                         style=custom_style_1).get('restart')
+        restart = prompt(restart_question()).get('restart')
         if not restart:
-            if prompt(exit_question(), style=custom_style_1).get('exit'):
+            if prompt(exit_question()).get('exit'):
                 break
             else:
                 restart = True

@@ -15,7 +15,12 @@ def credential_scan(etc_password, etc_shadow):
         'unshadow ./utils/password/etc_password.txt ./utils/password/etc_shadow.txt > ./utils/password/john.txt')
     os.popen('john --wordlist=./utils/word_lists/rockyou.txt ./utils/password/john.txt').read()
     credentials = os.popen('john --show ./utils/password/john.txt').read()
-    if re.finditer(r"^[1-9]\d* password hashes cracked", credentials, re.MULTILINE):
+    available_credentials = re.finditer(r"^[1-9]\d* password hashes cracked", credentials, re.MULTILINE)
+    is_available_credentials = False
+    for match in available_credentials:
+            is_available_credentials = True
+    
+    if is_available_credentials:
         print('\n----------------------------------------------------\n')
         print(colored('Available credentials: \n', 'green'))
         for credential in credentials.split('\n'):
@@ -24,4 +29,4 @@ def credential_scan(etc_password, etc_shadow):
             c = credential.split(":")
             print(colored(c[0] + " : " + c[1], 'green'))
     else:
-        print('No credential found.')
+        print('\nNo credential found.\n')

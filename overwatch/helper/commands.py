@@ -1,0 +1,4 @@
+FIND_SUID_BINARIES = 'find / -type f -perm -u=s 2>/dev/null'
+FIND_USERS = 'getent passwd | awk -F: \'{ print $1}\''
+FIND_USEFUL_BINARIES = 'which nmap aws nc ncat netcat nc.traditional wget curl ping gcc g++ make gdb base64 socat python python2 python3 python2.7 python2.6 python3.6 python3.7 perl php ruby xterm doas sudo fetch docker lxc ctr runc rkt kubectl 2>/dev/null'
+FIND_AVAILABLE_COMPILERS = '(dpkg --list 2>/dev/null | grep "compiler" | grep -v "decompiler\|lib" 2>/dev/null || yum list installed \'gcc*\' 2>/dev/null | grep gcc 2>/dev/null; which gcc g++ 2>/dev/null || locate -r "/gcc[0-9\.-]\+$" 2>/dev/null | grep -v "/doc/")'

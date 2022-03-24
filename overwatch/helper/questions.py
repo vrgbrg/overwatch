@@ -13,6 +13,18 @@ def open_port_question(open_ports):
     ]
 
 
+def localhost_question():
+    return [
+        {
+            'type': 'list',
+            'name': 'scan',
+            'message': 'What scan?',
+            'choices': ['User list', 'Running processes', 'Suid binaries', 'Useful binaries', 'Available compilers', 'Mounted devices', 'Continue'],
+            'filter': lambda val: val.lower()
+        }
+    ]
+
+
 def ssh_question():
     return [
         {
@@ -24,6 +36,16 @@ def ssh_question():
         }
     ]
 
+def telnet_question():
+    return [
+        {
+            'type': 'list',
+            'name': 'scan',
+            'message': 'What scan?',
+            'choices': ['User list', 'Suid binaries', 'Useful binaries', 'Available compilers', 'Reverse shell', 'Available credentials', 'Continue'],
+            'filter': lambda val: val.lower()
+        }
+    ]
 
 def continue_question():
     return [

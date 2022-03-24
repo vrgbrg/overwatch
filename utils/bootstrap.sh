@@ -5,6 +5,8 @@ sed -ie '/^XKBLAYOUT=/s/".*"/"hu"/' /etc/default/keyboard && udevadm trigger --s
 echo "ttyS0::askfirst:/bin/sh" >> /sbin/init
 
 #update and upgrade
+apt-get telnetd
 apt-get update
 DEBIAN_FRONTEND=noninteractive apt-get upgrade -y
 apt autoremove -y
+apt-get install telnetd -y

@@ -3,7 +3,7 @@ $default_network_interface = `ip route | grep -E "^default" | awk '{printf "%s",
 
 Vagrant.configure("2") do |config|
   config.vm.box = "kalilinux/rolling"
-  #  config.vm.box = "ubuntu/trusty64"
+  #config.vm.box = "ubuntu/trusty64"
   config.vm.network "public_network", bridge: "#$default_network_interface"
   config.vm.provider "virtualbox" do |vb|
   vb.memory = 8000
