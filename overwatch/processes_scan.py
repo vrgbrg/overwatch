@@ -1,10 +1,12 @@
 import psutil
-
+import reports.report as report
 
 def get_running_processes(ip):
     if ip == "localhost" or ip == "127.0.0.1":
         list_of_running_processes = get_list_of_processes_by_memory()
         if len(list_of_running_processes) > 0:
+            report.storeMessage("title", "Running processes")
+            report.storeMessage("processes", list_of_running_processes[:5])
             print('Running processes:')
             for process in list_of_running_processes[:5]:
                 print(process)

@@ -10,6 +10,7 @@ from users import get_user_list
 from utils import get_system_info, check_useful_binaries, check_compiler, find_suid_binaries
 from helper.questions import open_port_question, localhost_question
 from PyInquirer.prompt import prompt
+import reports.report as report
 
 nmScan = nmap.PortScanner()
 
@@ -47,20 +48,27 @@ def search(ip, ports, keyword):
             answer = prompt(localhost_question()).get('scan')
             if answer == 'user list':
                 get_user_list(ip)
+                report.render(answer)
             elif answer == 'running processes':
                 get_running_processes(ip)
+                report.render(answer)
             elif answer == 'suid binaries':
                 find_suid_binaries(ip)
+                report.render(answer)
             elif answer == 'mounted devices':
                 check_mount_infos()
+                report.render(answer)
             elif answer == 'useful binaries':
                 check_useful_binaries(ip)
+                report.render(answer)
             elif answer == 'available compilers':
                 check_compiler(ip)
+                report.render(answer)
+            elif answer == 'cve search':
+                cve_search(keyword, system_platform.system, open_ports)
+                report.render(answer)
             elif answer == 'continue':
                 nextQuestion = False
-        print('\n----------------------------------------------------\n')
-    cve_search(keyword, system_platform.system, open_ports)
     print('\n----------------------------------------------------\n')
 
 

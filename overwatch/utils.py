@@ -1,5 +1,6 @@
 import os
 import platform
+import reports.report as report
 from model.system_info import SystemInfo
 from helper.commands import FIND_SUID_BINARIES, FIND_USEFUL_BINARIES, FIND_AVAILABLE_COMPILERS
 
@@ -30,14 +31,26 @@ def get_system_info(ip, nmScan):
 
 def check_useful_binaries(ip):
     if ip == 'localhost' or ip == '127.0.0.1':
-        os.system(FIND_USEFUL_BINARIES)
+        print("Processing...")
+        binaries = os.popen(FIND_USEFUL_BINARIES).read().split("\n")
+        if len(binaries) > 0:
+            report.storeMessage("title", "Useful Binaries")
+            report.storeMessage("useful_binaries", binaries)
+            for b in binaries:
+                print(b)
     else:
         return FIND_USEFUL_BINARIES
 
 
 def check_compiler(ip):
     if ip == 'localhost' or ip == '127.0.0.1':
-        os.system(FIND_AVAILABLE_COMPILERS)
+        print("Processing...")
+        compilers = os.popen(FIND_AVAILABLE_COMPILERS).read().split("\n")
+        if len(compilers) > 0:
+            report.storeMessage("title", "Available Compilers")
+            report.storeMessage("available_compilers", compilers)
+            for c in compilers:
+                print(c)
     else:
         return FIND_AVAILABLE_COMPILERS
 
@@ -45,6 +58,12 @@ def check_compiler(ip):
 def find_suid_binaries(ip):
     cmd = FIND_SUID_BINARIES
     if ip == 'localhost' or ip == '127.0.0.1':
-        os.system(cmd)
+        print("Processing...")
+        binaries = os.popen(cmd).read().split("\n")
+        if len(binaries) > 0:
+            report.storeMessage("title", "SUID Binaries")
+            report.storeMessage("binaries", binaries)
+            for b in binaries:
+                print(b)
     else:
         return cmd

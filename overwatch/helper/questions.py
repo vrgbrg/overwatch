@@ -19,7 +19,7 @@ def localhost_question():
             'type': 'list',
             'name': 'scan',
             'message': 'What scan?',
-            'choices': ['User list', 'Running processes', 'Suid binaries', 'Useful binaries', 'Available compilers', 'Mounted devices', 'Continue'],
+            'choices': ['User list', 'Running processes', 'Suid binaries', 'Useful binaries', 'Available compilers', 'Mounted devices', 'CVE Search', 'Continue'],
             'filter': lambda val: val.lower()
         }
     ]
@@ -75,6 +75,16 @@ def exit_question():
             'type': 'confirm',
             'message': 'Do you want to exit?',
             'name': 'exit',
+            'default': False,
+        },
+    ]
+
+def read_recent_result_question():
+    return [
+        {
+            'type': 'confirm',
+            'message': 'Do want to read the recent result?',
+            'name': 'read',
             'default': False,
         },
     ]
